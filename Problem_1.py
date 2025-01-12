@@ -20,7 +20,7 @@ def process_logs(log_entries):
         if username in user_suspended:
             violations.append(f"SUSPENSION_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
             continue
-        
+
         if username in user_lockout and timestamp < user_lockout[username]:
             violations.append(f"LOCKOUT_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
             continue
@@ -31,54 +31,40 @@ def process_logs(log_entries):
 
         if access_result == "FAILURE":
             user_failures[username].append(timestamp)
-            ip_failures[ip_address].append(timestamp)
-
-            if len(user_failures[username]) >= 3 and (timestamp - user_failures[username][-1]) <= timedelta(minutes=5):
-                user_lockout[username] = timestamp + timedelta(minutes=5)
-
-            while ip_failures[ip_address] and (timestamp - ip_failures[ip_address][0]) > timedelta(minutes=20):
-                ip_failures[ip_address].popleft()
-            if len(ip_failures[ip_address]) >= 5:
-                ip_blacklist[ip_address] = timestamp + timedelta(minutes=30)
-
-            while user_failures[username] and (timestamp - user_failures[username][0]) > timedelta(hours=24):
+            if len(user_failures[username]) > 10:
                 user_failures[username].popleft()
-            if len(user_failures[username]) >= 10:
+
+            if len(user_failures[username]) == 10 and (timestamp - user_failures[username][0]).total_seconds() <= 86400:
                 user_suspended.add(username)
+                violations.append(f"SUSPENSION_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
+
+            if len(user_failures[username]) >= 3 and (timestamp - user_failures[username][-3]).total_seconds() <= 300:
+                user_lockout[username] = timestamp + timedelta(seconds=300)
+                violations.append(f"LOCKOUT_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
+
+            ip_failures[ip_address].append(timestamp)
+            if len(ip_failures[ip_address]) > 5:
+                ip_failures[ip_address].popleft()
+
+            if len(ip_failures[ip_address]) == 5 and (timestamp - ip_failures[ip_address][0]).total_seconds() <= 1200:
+                ip_blacklist[ip_address] = timestamp + timedelta(seconds=1800)
+                violations.append(f"BLACKLIST_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
 
         elif access_result == "SUCCESS":
-            user_failures[username].clear()
+            if username in user_failures:
+                user_failures[username].clear()
 
     if not violations:
-        print("NO_VIOLATION")
-    else:
-        for violation in violations:
-            print(violation)
+        return ["NO_VIOLATION"]
 
-def main():
-    print("Enter log entries (press Enter twice to finish):")
-    log_entries = []
-    
-    first_line = input().strip()
-    if not first_line.isdigit():
-        print("Invalid input: The first line must be a number indicating the number of cases.")
-        return
-    
-    num_cases = int(first_line)
-    
-    for _ in range(num_cases):
-        line = input().strip()
-        if line == "":
-            print("Invalid input: Not enough log entries provided.")
-            return
-        log_entries.append(line)
-    
-    extra_line = input().strip()
-    if extra_line != "":
-        print("Invalid input: Extra log entries provided.")
-        return
-    
-    process_logs(log_entries)
-    
-if __name__ == "__main__":
-    main()
+    return violations
+
+log_entries = []
+num_entries = int(input(""))
+for _ in range(num_entries):
+    entry = input().strip()
+    log_entries.append(entry)
+
+violations = process_logs(log_entries)
+for violation in violations:
+    print(violation)
