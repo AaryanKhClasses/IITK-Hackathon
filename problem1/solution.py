@@ -1,84 +1,57 @@
-from datetime import datetime, timedelta
-from collections import defaultdict, deque
+from datetime import datetime
 
-def parse_log_entry(entry):
-    timestamp, username, ip_address, access_result = entry.split()
-    timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
-    return timestamp, username, ip_address, access_result
+def td(tsE, tsS, secs):
+    template = "%Y-%m-%dT%H:%M:%SZ"
+    timeStart = datetime.strptime(tsS, template)
+    timeEnd = datetime.strptime(tsE, template)
+    return (timeEnd-timeStart).total_seconds()>secs
 
-def process_logs(log_entries):
-    user_failures = defaultdict(deque)
-    ip_failures = defaultdict(deque)
-    user_lockout = {}
-    ip_blacklist = {}
-    user_suspended = set()
-    violations = []
-
-    for entry in log_entries:
-        timestamp, username, ip_address, access_result = parse_log_entry(entry)
-
-        if username in user_suspended:
-            violations.append(f"SUSPENSION_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
-            continue
-        
-        if username in user_lockout and timestamp < user_lockout[username]:
-            violations.append(f"LOCKOUT_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
-            continue
-
-        if ip_address in ip_blacklist and timestamp < ip_blacklist[ip_address]:
-            violations.append(f"BLACKLIST_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
-            continue
-
-        if access_result == "FAILURE":
-            user_failures[username].append(timestamp)
-            ip_failures[ip_address].append(timestamp)
-
-            if len(user_failures[username]) >= 3 and (timestamp - user_failures[username][-1]) <= timedelta(minutes=5):
-                user_lockout[username] = timestamp + timedelta(minutes=5)
-
-            while ip_failures[ip_address] and (timestamp - ip_failures[ip_address][0]) > timedelta(minutes=20):
-                ip_failures[ip_address].popleft()
-            if len(ip_failures[ip_address]) >= 5:
-                ip_blacklist[ip_address] = timestamp + timedelta(minutes=30)
-
-            while user_failures[username] and (timestamp - user_failures[username][0]) > timedelta(hours=24):
-                user_failures[username].popleft()
-            if len(user_failures[username]) >= 10:
-                user_suspended.add(username)
-
-        elif access_result == "SUCCESS":
-            user_failures[username].clear()
-
-    if not violations:
-        print("NO_VIOLATION")
-    else:
-        for violation in violations:
-            print(violation)
-
-def main():
-    print("Enter log entries (press Enter twice to finish):")
-    log_entries = []
-    
-    first_line = input().strip()
-    if not first_line.isdigit():
-        print("Invalid input: The first line must be a number indicating the number of cases.")
-        return
-    
-    num_cases = int(first_line)
-    
-    for _ in range(num_cases):
-        line = input().strip()
-        if line == "":
-            print("Invalid input: Not enough log entries provided.")
-            return
-        log_entries.append(line)
-    
-    extra_line = input().strip()
-    if extra_line != "":
-        print("Invalid input: Extra log entries provided.")
-        return
-    
-    process_logs(log_entries)
-    
+users = {}
+addresses = {}
+logs = []
+violation = 0
 if __name__ == "__main__":
-    main()
+    tc = int(input())
+    for _ in range(0, tc):
+        logs.append(input())
+    for log in logs:
+        ts, us, ip, va = log.split(" ")
+        if us not in users:
+            users[us] = [0, [0, ts], [0, ts]]
+        if ip not in addresses:
+            addresses[ip] = [0, [0, ts], ts]
+        if va == "FAILURE":
+            if (users[us][1][0]) < 10 and (td(ts, users[us][1][1], 86400)):
+                users[us][1][1] = ts
+                users[us][1][0] = 0
+            if (td(ts, addresses[ip][1][1], 1200) or (addresses[ip][1][0]==5 and td(ts, addresses[ip][2], 1800))):
+                addresses[ip][1][0] = 0
+            if (users[us][2][0]==3 and td(ts, users[us][2][1], 300)):
+                users[us][2][0] = 0
+
+            if users[us][1][0]>=10:
+                print(f"SUSPENSION_VIOLATION {ts} {us} {ip}")
+                violation += 1
+                continue
+            if addresses[ip][1][0]>=5:
+                print(f"BLACKLIST_VIOLATION {ts} {us} {ip}")
+                violation += 1
+                continue
+            if users[us][2][0]>=3:
+                print(f"LOCKOUT_VIOLATION {ts} {us} {ip}")
+                violation += 1
+                continue
+
+            users[us][0]        += 1
+            users[us][1][0]     += 1
+            users[us][2][0]     += 1
+            addresses[ip][0]    += 1
+            addresses[ip][1][0] += 1
+            if (users[us][2][0]==3):
+                users[us][2][1] = ts
+            if (addresses[ip][1][0]==5):
+                addresses[ip][2] = ts
+        else:
+            users[us][2][0] = 0
+    if violation==0:
+        print("NO_VIOLATION")
