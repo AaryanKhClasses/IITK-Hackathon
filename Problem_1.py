@@ -18,15 +18,15 @@ def process_logs(log_entries):
         timestamp, username, ip_address, access_result = parse_log_entry(entry)
 
         if username in user_suspended:
-            violations.append(f"SUSPENSION_VIOLATION {timestamp.isoformat()} {username} {ip_address}")
+            violations.append(f"SUSPENSION_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
             continue
         
         if username in user_lockout and timestamp < user_lockout[username]:
-            violations.append(f"LOCKOUT_VIOLATION {timestamp.isoformat()} {username} {ip_address}")
+            violations.append(f"LOCKOUT_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
             continue
 
         if ip_address in ip_blacklist and timestamp < ip_blacklist[ip_address]:
-            violations.append(f"BLACKLIST_VIOLATION {timestamp.isoformat()} {username} {ip_address}")
+            violations.append(f"BLACKLIST_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
             continue
 
         if access_result == "FAILURE":
