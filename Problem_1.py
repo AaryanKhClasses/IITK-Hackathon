@@ -33,7 +33,7 @@ def process_logs(log_entries):
             user_failures[username].append(timestamp)
             ip_failures[ip_address].append(timestamp)
 
-            if len(user_failures[username]) >= 3 and (timestamp - user_failures[username][-3]) <= timedelta(minutes=5):
+            if len(user_failures[username]) >= 3 and (timestamp - user_failures[username][-1]) <= timedelta(minutes=5):
                 user_lockout[username] = timestamp + timedelta(minutes=5)
 
             while ip_failures[ip_address] and (timestamp - ip_failures[ip_address][0]) > timedelta(minutes=20):
