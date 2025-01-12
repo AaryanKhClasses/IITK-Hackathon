@@ -1,0 +1,16 @@
+1. LIST_DIR has execute permissions rather than read
+On point 6 of the first test, the professor required Read access to LIST_DIR
+The test2.txt file has a similar structure
+python solution.py < test2.txt, returns
+SUCCESS
+SUCCESS
+
+2. Auditing is not performed
+
+3. A user without have Write access to a directory can delete a file in that directory if they have Write access on the file
+In point 5 of the first test, the proffesor is not allowed to delete /university/grades.csv because he doesn't have Write access on parent directory(i.e. /university)
+The test1.txt file has a similar structure, wherein person2 has Write access on /dir/file but no Write access on /dir
+python solution.py < test1.txt, returns
+SUCCESS
+SUCCESS
+SUCCESS
