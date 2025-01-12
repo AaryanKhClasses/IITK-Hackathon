@@ -1,0 +1,7 @@
+2
+person1
+person2
+3
+CREATE_DIR person1 /dir person1:R,W,X
+CREATE_FILE person1 /dir/file person2:W
+DELETE person2 /dir/file

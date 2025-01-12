@@ -1,0 +1,6 @@
+2
+person1
+person2
+2
+CREATE_DIR person1 /dir person2:X
+LIST_DIR person2 /dir
