@@ -21,7 +21,6 @@ def process_logs(log_entries):
         if username in user_suspended:
             violations.append(f"SUSPENSION_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
             continue
-
         # Check for lockout violations
         if username in user_lockout and timestamp < user_lockout[username]:
             violations.append(f"LOCKOUT_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
@@ -37,17 +36,14 @@ def process_logs(log_entries):
             user_failures[username].append(timestamp)
             if len(user_failures[username]) > 10:
                 user_failures[username].popleft()
-
             # Check for user suspension
             if len(user_failures[username]) == 10 and (timestamp - user_failures[username][0]).total_seconds() <= 86400:
                 user_suspended.add(username)
                 violations.append(f"SUSPENSION_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
-
             # Check for user lockout
             if len(user_failures[username]) >= 3 and (timestamp - user_failures[username][-3]).total_seconds() <= 300:
                 user_lockout[username] = timestamp + timedelta(seconds=300)
                 violations.append(f"LOCKOUT_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
-
             # Update IP failures
             ip_failures[ip_address].append(timestamp)
             if len(ip_failures[ip_address]) > 5:
@@ -59,7 +55,6 @@ def process_logs(log_entries):
                 violations.append(f"BLACKLIST_VIOLATION {timestamp.isoformat().replace('+00:00', 'Z')} {username} {ip_address}")
 
         elif access_result == "SUCCESS":
-            # Reset user failures on successful login
             if username in user_failures:
                 user_failures[username].clear()
 
