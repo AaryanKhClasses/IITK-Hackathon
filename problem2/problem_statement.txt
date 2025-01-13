@@ -1,0 +1,162 @@
+In an era where data is the new oil, India's digital landscape is rapidly evolving. From small businesses storing sensitive customer data to educational institutions managing confidential student records, the need for robust digital security has never been greater. Yet, breaches and unauthorized access continue to make headlines, leaving citizens and organizations vulnerable.
+
+Imagine you’re tasked with creating a secure, hierarchical Digital Lockbox for India’s diverse and vibrant digital ecosystem. This system must cater to individuals, small businesses, and large enterprises, ensuring that only authorized users have access to files and directories. Your mission is to design a Secure File System (SFS) that can handle user-specific permissions, maintain a clear audit trail, and provide the kind of protection that India's digital future demands.
+
+Will your system be the shield that protects India’s digital treasures? Step up and show your skills in this challenge that blends technology, security, and national impact.
+
+Objective:
+Develop a Secure File System (SFS) tailored for India’s needs that enforces access control policies at the file system level. The system should support hierarchical directories, enforce user-based access controls, and log every operation for accountability. Focus on creating a solution that is both secure and scalable.
+
+Core Features:
+1. User-Based Access Control:
+ - Implement a system where every file and directory has:
+ a. An owner.
+ b. Permissions (Read, Write, Execute) assigned to specific users.
+ - Permissions can vary for each user per file or directory.
+
+2. File System Operations:
+ - Support the following functionalities:
+ a. Create File/Directory: Add files and directories with specific permissions.
+ b. Read/Write File: View or modify file contents based on permissions.
+ c. List Directory: Display directory contents.
+ d. Delete: Remove files or directories (restricted by permissions).
+ - Maintain a hierarchical directory structure with subdirectories.
+
+3. Policy Enforcement:
+ - Strictly enforce permissions for every operation.
+ - Allow only owners or users with Write permissions to modify or delete files in a directory.
+ - Deny unauthorized actions and any actions that result in errors, such as operations on non-existent files or folders, or attempts to create files or folders that already exist.
+
+4. Audit Logging:
+ - Log every action with:
+ a. Username
+ b. Operation performed
+ c. Target file/directory
+ d. Result (Success or Deny)
+
+------------------------------------------------------------
+
+Input and Output Format:
+
+Input:
+1. Users:
+ - An integer U (number of users).
+ - U lines with usernames.
+2. Operations:
+ - An integer N (number of operations).
+
+N lines describing operations in the format:
+CREATE_FILE username filepath permissions
+CREATE_DIR username dirpath permissions
+READ_FILE username filepath
+WRITE_FILE username filepath
+LIST_DIR username dirpath
+DELETE username path
+ - Permissions are in this format:
+   user1:perm1,perm2;user2:perm1,perm2,perm3
+
+Output:
+For each operation, indicate the result of the log entry [SUCCESS/DENY]
+
+------------------------------------------------------------
+
+Example Scenario:
+Use Case: Educational Institution
+A university in Delhi is managing its internal systems:
+
+Input:
+3
+principal
+professor
+student
+8
+CREATE_DIR principal /university principal:R,W,X;professor:R,X
+CREATE_FILE principal /university/grades.csv principal:R,W,X;professor:R
+READ_FILE professor /university/grades.csv
+WRITE_FILE student /university/grades.csv
+DELETE professor /university/grades.csv
+LIST_DIR professor /university
+DELETE principal /university/grades.csv
+LIST_DIR principal /university
+
+Output:
+SUCCESS
+SUCCESS
+SUCCESS
+DENY
+DENY
+SUCCESS
+SUCCESS
+SUCCESS
+
+------------------------------------------------------------
+
+Explanation of the Output:
+
+1. Operation 1: SUCCESS
+The user principal creates a directory /university with permissions granting themselves Read, Write, Execute (R,W,X) and the professor Read, Execute (R,X) permissions.
+As the owner of the directory, the operation is successful.
+
+2. Operation 2: SUCCESS
+The user principal creates a file /university/grades.csv with Read, Write (R,W,X) permissions for themselves and Read (R) permissions for the professor.
+Since the principal is the owner, the operation is allowed and succeeds.
+
+3. Operation 3: SUCCESS
+The professor attempts to read the file /university/grades.csv.
+Since the professor has Read (R) permission for this file, the operation succeeds.
+
+4. Operation 4: DENY
+The student attempts to write to the file /university/grades.csv.
+The file does not grant Write (W) permission to the student, so the operation is denied.
+
+5. Operation 5: DENY
+The professor tries to delete the file /university/grades.csv.
+Only the file's owner (principal) or a user with Write (W) permissions on the parent directory /university can perform this action. Since the professor lacks Write (W) permission on /university, the operation is denied.
+
+6. Operation 6: SUCCESS
+The professor lists the contents of the directory /university.
+As the professor has Read (R) permission on the /university directory, the operation is successful.
+
+7. Operation 7: SUCCESS
+The principal, as the owner of the file /university/grades.csv, deletes the file.
+Owners inherently have all permissions on their files and directories, so the operation succeeds.
+
+8. Operation 8: SUCCESS
+The principal lists the contents of the directory /university.
+After the deletion of grades.csv, the directory is now empty, and the operation confirms this. The success message indicates the directory contents were listed successfully.
+
+------------------------------------------------------------
+
+Example Scenario 2:
+Use Case: Non-Existent File/Directory
+In this scenario, we test the system's behavior when users attempt operations on files and directories that do not exist in the system. This ensures that the Secure File System handles error cases gracefully and provides clear feedback to users.
+
+Input:
+2
+admin
+user
+3
+READ_FILE user /nonexistent/file.txt
+DELETE admin /random/directory
+LIST_DIR user /not/there
+
+Expected Output:
+DENY
+DENY
+DENY
+
+------------------------------------------------------------
+
+Explanation of the Output:
+1. Operation 1: DENY
+The user "user" attempts to read a file at the path /nonexistent/file.txt. Since this file does not exist in the system, the operation is denied.
+
+2. Operation 2: DENY
+The user "admin" tries to delete a directory at /no/such/directory. As this directory does not exist in the system, the operation is denied.
+
+3. Operation 3: DENY
+The user "user" attempts to list the contents of the directory /not/there. Because no directory exists at this location, the system denies the request.
+
+------------------------------------------------------------
+
+Become the developer who ensures that India's digital files are safe and protected. Build a file system that can handle real-world complexities, and leave your mark on India’s digital security landscape. Are you ready to rise to the challenge?
