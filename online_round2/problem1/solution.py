@@ -19,12 +19,14 @@ print(f"2A:-{total_attempts}-;")
 
 if not attempts.empty:
     first_payload = attempts.sort_values(by="Time").iloc[0]["Info"]
+    first_payload = first_payload.split(" ")[1]  # Extract URI path and parameters
     print(f"3A:-{first_payload}-;")
 else:
     print("3A:-NULL-;")
 
 if not attempts.empty:
     last_payload = attempts.sort_values(by="Time").iloc[-1]["Info"]
+    last_payload = last_payload.split(" ")[1]  # Extract URI path and parameters
     print(f"4A:-{last_payload}-;")
 else:
     print("4A:-NULL-;")
