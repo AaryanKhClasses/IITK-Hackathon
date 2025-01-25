@@ -1,11 +1,10 @@
 import spacy
-from bs4 import BeautifulSoup
 import json
-from iocs import Iocs
-from ttps import Ttps
-from malware_detect import Malware
-from threat_actors import ThreatActors
-from targeted_entities import TargetedEntities
+from helpers.iocs import Iocs
+from helpers.ttps import Ttps
+from helpers.malware_detect import Malware
+from helpers.threat_actors import ThreatActors
+from helpers.targeted_entities import TargetedEntities
 
 nlp = spacy.load("en_core_web_sm")
 
