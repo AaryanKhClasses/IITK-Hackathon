@@ -1,8 +1,0 @@
-2
-admin
-user
-3
-READ_FILE user /nonexistent/file.txt
-DELETE admin /random/directory
-LIST_DIR user /not/there
-
