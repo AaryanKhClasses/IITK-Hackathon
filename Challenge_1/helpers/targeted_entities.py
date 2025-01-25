@@ -18,5 +18,5 @@ class TargetedEntities:
         for chunk in self.nlp(self.text).noun_chunks:
             if any(keyword in chunk.text.lower() for keyword in sector_keywords):
                 entities.append(chunk.text)
-        
+        entities = list(set(entities)) 
         return entities

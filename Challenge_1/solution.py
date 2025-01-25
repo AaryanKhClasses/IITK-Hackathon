@@ -1,6 +1,8 @@
 import spacy
 import json
 import argparse
+import pymupdf as pdf
+from os import listdir
 from helpers.iocs import Iocs
 from helpers.ttps import Ttps
 from helpers.malware_detect import Malware
@@ -14,7 +16,11 @@ def read_file(filename):
     with open(filename, 'r') as file:
       return file.read()
   elif ".pdf" in filename:
-    pass
+    file = pdf.open(filename)
+    text = ""
+    for page in file:
+      text += str(page.get_text())
+    return text
 
 def display(filename, data, out_dir, show):
   if not out_dir and show:
@@ -47,7 +53,7 @@ if __name__=="__main__":
       description="Extracts Key Threat Intelligence Data From Given File, including Indicators of Compromise, TTTps, Malware Information, Threat Actors and Targeted Entities"
   )
   parser.add_argument("-f", "--file", help = "Filename to process, can be .pdf or .txt only")
-  parser.add_argument("-d", "--dir", help = "Directory to search files in")
+  parser.add_argument("-d", "--dir", help = "Directory to search files in, will not search recursively")
   parser.add_argument("-o", "--out", help = "Directory to store output .json file, output filename is same as input filename")
   parser.add_argument("-s", "--show", help = "Prints filename to stdout", action="store_true")
   args = parser.parse_args()
@@ -56,6 +62,8 @@ if __name__=="__main__":
   if not arg['dir'] and not arg['file']:
     parser.parse_args(['-h'])
   if arg["dir"]:
-    dir = arg["dir"]
+    files = listdir(arg["dir"])
+    for file in files:
+      display(file, start(read_file(f"{arg['dir']}/{file}")), arg["out"], arg["show"])
   if arg["file"]:
     display(arg["file"], start(read_file(arg["file"])), arg["out"], arg["show"])

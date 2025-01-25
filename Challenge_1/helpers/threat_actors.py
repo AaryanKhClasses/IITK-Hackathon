@@ -13,5 +13,5 @@ class ThreatActors:
                 threat_actors.append(ent.text)
         pattern = re.compile(r'\bAPT\d+\b', re.IGNORECASE)
         threat_actors.extend(pattern.findall(self.text))
-        
+        threat_actors = list(set(threat_actors))
         return threat_actors
