@@ -13,7 +13,6 @@ class TargetedEntities:
             if ent.label_ in ["ORG", "GPE"] and ent.text not in threat_actors and ent.text not in unwanted_terms:
                 entities.append(ent.text)
         
-        # Dynamically include specific sectors
         sector_keywords = ["sector", "organization", "industry"]
         for chunk in self.nlp(self.text).noun_chunks:
             if any(keyword in chunk.text.lower() for keyword in sector_keywords):
