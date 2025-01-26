@@ -36,7 +36,7 @@ def start(report_text):
     iocs = Iocs(report_text)
     ttps = Ttps(report_text, nlp)
     threat_actors = ThreatActors(report_text, nlp)
-    malware = Malware(report_text, nlp)
+    malware = Malware(report_text)
     targeted_entities = TargetedEntities(report_text, nlp)
 
     data = {
