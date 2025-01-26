@@ -82,7 +82,7 @@ This section requires a VirusTotal API Key to be provided in order for the scrip
 ## **Documentation:**
 
 ### Prerequisites:
-1) **Python:** As this is a python script, you would require a python instance available on your device. [Click Here to Download Python]([(https://www.python.org/downloads/))
+1) **Python:** As this is a python script, you would require a python instance available on your device. [Click Here to Download Python](https://www.python.org/downloads/)
 2) **VirusTotal API Key:** Go to [The VirusTotal Website](https://www.virustotal.com/gui/home/upload) and create an account. Now, by clicking your user profile (in the Navbar), navigate to the API Key section. Just copy and paste the API Key into the .env.example file, and then rename the file to .env
 
 > [!WARNING]
