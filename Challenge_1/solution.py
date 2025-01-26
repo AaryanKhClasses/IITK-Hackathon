@@ -29,13 +29,14 @@ def display(filename, data, out_dir, show):
         with open(f"{out_dir}/{filename.split('.')[0]}.json", 'w') as file:
             file.write(data)
     else:
+        pass
         print(data)
 
 def start(report_text):
     iocs = Iocs(report_text)
     ttps = Ttps(report_text, nlp)
     threat_actors = ThreatActors(report_text, nlp)
-    malware = Malware(report_text)
+    malware = Malware(report_text, nlp)
     targeted_entities = TargetedEntities(report_text, nlp)
 
     data = {
