@@ -1,3 +1,4 @@
 .idx
 *.env
 **/__pycache__/
+*/creds.json
