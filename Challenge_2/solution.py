@@ -1,5 +1,6 @@
 import os
 import pickle
+import requests
 import base64
 from bs4 import BeautifulSoup
 from googleapiclient.discovery import build
@@ -23,7 +24,6 @@ def getEmails():
         else:
             flow = InstalledAppFlow.from_client_secrets_file(credsPath, SCOPES)
             creds = flow.run_local_server(port=0)
-            print("meow")
         
         with open(picklePath, 'wb') as token:
             pickle.dump(creds, token)
@@ -48,14 +48,26 @@ def getEmails():
             data = data.replace("-","+").replace("_","/")
             decoded_data = base64.b64decode(data)
 
-            soup = BeautifulSoup(decoded_data, "lxml")
-            body = soup.body()
+            soup = BeautifulSoup(decoded_data, "html.parser")
+            body = soup.get_text()
 
-            print("Subject: ", subject)
-            print("From: ", sender)
-            print("Body: ", body)
-            print("\n\n")
+            isPhishing = checkPhishing(sender, subject, body)
+            if isPhishing:
+                print("Phishing email detected!")
+            else:
+                print("Email is safe!")
         except:
             pass
+
+phishingDomains = []
+domains = requests.get("https://raw.githubusercontent.com/Phishing-Database/Phishing.Database/refs/heads/master/phishing-domains-ACTIVE.txt")
+for domain in domains.text.splitlines():
+    phishingDomains.append(domain)
+
+def checkPhishing(sender, subject, body):
+    for domain in phishingDomains:
+        if domain in sender or domain in subject or domain in body:
+            return True
+    return False
 
 getEmails()
