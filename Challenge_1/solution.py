@@ -33,7 +33,7 @@ def display(filename, data, out_dir, show):
         print(data)
 
 def start(report_text):
-    iocs = Iocs(report_text)
+    iocs = Iocs(report_text, nlp)
     ttps = Ttps(report_text, nlp)
     threat_actors = ThreatActors(report_text, nlp)
     malware = Malware(report_text)
