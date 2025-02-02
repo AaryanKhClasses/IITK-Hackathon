@@ -31,6 +31,9 @@ The requirement for the above modules in the script is mentioned here:
 - **beautifulsoup4:** Required to get the body of the mail message in a more readable manner.
 - The rest of the required modules are used for the Gmail API to connect to the mailing list and fetch the mails.
 
+## Link to Video Explaining the Logic and Demonstration:
+![Click Here](https://github.com/AaryanKhClasses/IITK-Hackathon/blob/main/Challenge_2/Submission_Video.mp4)
+
 ## Logic of the Script:
 1. The domains of all the phishing URLs are extracted from the Phishing.Database GitHub repository and is stored in a list.
 2. The [pre-trained BERT Model](https://huggingface.co/ealvaradob/bert-finetuned-phishing) "ealvaradob/bert-finetuned-phishing" is also imported and initalized.
